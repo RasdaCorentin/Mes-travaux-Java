@@ -4,6 +4,9 @@
  */
 package com.doranco.modulelogin;
 
+import com.doranco.dao.DaoFactory;
+import com.doranco.dao.iinterface.UtilisateurDaoInterface;
+import com.doranco.entities.Utilisateur;
 import com.doranco.principal.TPPrincipal;
 import java.io.IOException;
 import java.util.Map;
@@ -22,7 +25,7 @@ import javax.security.auth.spi.LoginModule;
  */
 public class TPModuleLogin implements LoginModule {
 
-    private static final String[][] USERS__TEST = {{"Corentin", "123"},{"Rasda","1234"}};
+//    private static final String[][] USERS__TEST = {{"Corentin", "123"},{"Rasda","1234"}};
     private Subject subject;
     private CallbackHandler callbackHandler;
     private TPPrincipal tPPrincipal;
@@ -41,22 +44,36 @@ public class TPModuleLogin implements LoginModule {
         Callback[] callbacks = new Callback[2];
         callbacks[0] = new NameCallback("Nom: ");
         callbacks[1] = new PasswordCallback("Mot de passe: ",false);
+        
         try{
             this.callbackHandler.handle(callbacks);
             String nom = ((NameCallback)callbacks[0]).getName();
             String password = new String (((PasswordCallback) callbacks[1]).getPassword());
-            int position = 0;
-
-            while(position < USERS__TEST.length){
-                if(USERS__TEST [position][0].equals(nom) && USERS__TEST[position][1].equals(password)){
-                    System.out.println("<-----------Authentification avec succés----------->");
-                    tPPrincipal = new TPPrincipal(nom);
-                    login = true;
-                    break;
-                }
-                position ++;
-            }
             
+            Utilisateur utilisateur = new Utilisateur(nom, password);
+            DaoFactory daoFactory = new DaoFactory();
+            UtilisateurDaoInterface utilisateurDaoInterface = daoFactory.getUtilisateurDaoInterface();
+            
+            utilisateur = utilisateurDaoInterface.loginUtilisateur(utilisateur);
+            if(utilisateur != null){
+                System.out.println("Auth sucess");
+                tPPrincipal = new TPPrincipal(utilisateur.getNom());
+                login = true;
+                
+            }
+                    
+//            int position = 0;
+//
+//            while(position < USERS__TEST.length){
+//                if(USERS__TEST [position][0].equals(nom) && USERS__TEST[position][1].equals(password)){
+//                    System.out.println("<-----------Authentification avec succés----------->");
+//                    tPPrincipal = new TPPrincipal(nom);
+//                    login = true;
+//                    break;
+//                }
+//                position ++;
+//            }
+//            
             
         }catch(IOException | UnsupportedCallbackException ex){
             System.out.println("Erreur :" + ex);

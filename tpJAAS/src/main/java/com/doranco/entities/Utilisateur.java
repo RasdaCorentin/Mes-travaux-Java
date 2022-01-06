@@ -26,11 +26,13 @@ public class Utilisateur implements Serializable{
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private int id;
     
-    @Column(name = "nom")
+    @Column(unique = true, nullable = false)
     private String nom;
     
     @Column(name = "password")
     private String password;
+    
+    private String salt;
     
     // Constructeur vide sans parametres
     public Utilisateur() {
@@ -104,5 +106,19 @@ public class Utilisateur implements Serializable{
                     + this.password;
 
         }
+
+    /**
+     * @return the salt
+     */
+    public String getSalt() {
+        return salt;
+    }
+
+    /**
+     * @param salt the salt to set
+     */
+    public void setSalt(String salt) {
+        this.salt = salt;
+    }
     
 }

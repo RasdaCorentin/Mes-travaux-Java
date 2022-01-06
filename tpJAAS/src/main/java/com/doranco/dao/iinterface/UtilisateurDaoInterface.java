@@ -19,13 +19,17 @@ public interface UtilisateurDaoInterface {
     //Creer un Utilisateur
     Utilisateur createUtilisateur(Utilisateur utilisateur);
     
+    Utilisateur loginUtilisateur(Utilisateur utilisateur);
+    
     //Lire un Utilisateur a partir de son ID
-    Utilisateur readUtilisateur(int id);
+    Utilisateur findUtilisateurByNom(Utilisateur utilisateur);
     
-    //Mettre a jour un Utilisateur
-    boolean updateUtilisateur(Utilisateur utilisateur, int id);
+//    //Mettre a jour un Utilisateur
+//    boolean updateUtilisateur(Utilisateur utilisateur, int id);
+//    
+//    //Supprimer un Utilisateur
+//    boolean deleteUtilisateur(int id);
     
-    //Supprimer un Utilisateur
-    boolean deleteUtilisateur(int id);
+    boolean comparePassword(String passwordTemp, Utilisateur utilisateur);
     
 }
