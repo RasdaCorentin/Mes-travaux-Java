@@ -1,0 +1,11 @@
+// Generer 1ere clef serv
+keytool -genkeypair -alias doranco -keyalg RSA -validity 7 -keystore keystore.jks
+
+//Voir clef
+keytool -list -v -keystore keystore.jks
+
+//Creer clef client 
+keytool -export -alias doranco -keystore keystore.jks -rfc -file keystore.cert
+
+//??? mais à faire
+keytool -import -alias doranco -file keystore.cert -keystore trustkeystore.jts
