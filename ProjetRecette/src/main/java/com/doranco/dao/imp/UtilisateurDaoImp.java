@@ -12,9 +12,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
 import javax.persistence.Query;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -22,12 +20,21 @@ import org.mindrot.jbcrypt.BCrypt;
  * @author 
  */
 public class UtilisateurDaoImp implements UtilisateurDaoInterface {
+    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
+    LocalDateTime now = LocalDateTime.now();
+    
     private DaoFactory daoFactory;
     
     public UtilisateurDaoImp(DaoFactory daoFactory){
         this.daoFactory = daoFactory;
     }
     
+    
+/*
+--------------------------------------------------------------------------------------------------------------------------
+                                                 Liste Utilisateur avec DAO FACTORY 
+--------------------------------------------------------------------------------------------------------------------------
+*/    
 //Utilise Jquery pour avoir une liste d'utilisateur depuis la base de données
     @Override
     public List<Utilisateur> getListeUtilisateurs() {
@@ -56,7 +63,13 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
         }
         return listeUtilisateurs;
     }
-
+    
+    
+/*
+--------------------------------------------------------------------------------------------------------------------------
+                                                Création Utilisateur avec DAO FACTORY 
+--------------------------------------------------------------------------------------------------------------------------
+*/
     @Override
     public Utilisateur createUtilisateur(Utilisateur utilisateur) {
         
@@ -68,8 +81,7 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
             transaction = entityManager.getTransaction();
             
 // ------------------------------------------Methode-------------------------------------------------- 
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
-            LocalDateTime now = LocalDateTime.now();  
+             
 
             String salt = BCrypt.gensalt();
             String passwordHash = BCrypt.hashpw(utilisateur.getPassword(), salt);
@@ -77,6 +89,7 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
             utilisateur.setDateModif(dtf.format(now));
             utilisateur.setPassword(passwordHash);
             utilisateur.setSalt(salt);
+            utilisateur.setStatuts(true);
             transaction.begin();
             entityManager.persist(utilisateur);
             transaction.commit();
@@ -97,7 +110,13 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
         }
         return null;
     }
-
+    
+    
+/*
+--------------------------------------------------------------------------------------------------------------------------
+                                                Outils 
+--------------------------------------------------------------------------------------------------------------------------
+*/
     @Override
     public Utilisateur findUtilisateurByNom(Utilisateur utilisateur) {
         EntityManager entityManager = null;            
@@ -109,7 +128,18 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
                   return null;}
               utilisateur = (Utilisateur) query.getResultList().get(0);           
               return utilisateur;}
-
+    @Override
+    public Utilisateur findUtilisateurById(int id) {
+        EntityManager entityManager = null;
+            Utilisateur utilisateur = new Utilisateur();
+            entityManager = daoFactory.getEntityManager();
+            Query query = entityManager.createQuery("select util from Utilisateur util where id=:id");
+              query.setParameter("id",id);             
+              if (query.getResultList().isEmpty()){
+                  System.out.println("Cet id utilisateur n'existe pas");
+                  return null;}
+              utilisateur = (Utilisateur) query.getResultList().get(0);           
+              return utilisateur;}
     /*
     Methode login lié à la methode compare
     */
@@ -154,6 +184,12 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
      return false;
     }
     
+    
+/*
+--------------------------------------------------------------------------------------------------------------------------
+                                                 Delete Utilisateur avec DAO FACTORY 
+--------------------------------------------------------------------------------------------------------------------------
+*/    
     @Override
     public boolean deleteUtilisateur(int id) {
         
@@ -192,5 +228,56 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
         }
         return false;
     }
+    
+    
+/*
+--------------------------------------------------------------------------------------------------------------------------
+                                                Update Utilisateur avec DAO FACTORY 
+--------------------------------------------------------------------------------------------------------------------------
+*/    
+    @Override
+    public boolean updateUtilisateur(Utilisateur utilisateur, int id) {
+        EntityManager entityManager = null;
+        EntityTransaction transaction = null;
+        try {
+            entityManager = daoFactory.getEntityManager();
+            System.out.println("------------------ DEBUT CHANGEMENT ---------");
+// ------------------------------------------Methode--------------------------------------------------
 
+            Utilisateur utilisateurAModifier = entityManager.find(Utilisateur.class, id);
+            if (utilisateurAModifier != null) {
+                transaction = entityManager.getTransaction();
+                
+                String salt = BCrypt.gensalt();
+                String passwordHash = BCrypt.hashpw(utilisateur.getPassword(), salt);
+                
+                utilisateurAModifier.setDateModif(dtf.format(now));
+                utilisateurAModifier.setNom(utilisateur.getNom());
+                utilisateurAModifier.setEmail(utilisateur.getEmail());
+                utilisateurAModifier.setPassword(passwordHash);
+                
+// ---------------------------------------FIN Methode--------------------------------------------------   
+                System.out.println("--------------------FIN CHANGEMENT-------------");
+                transaction.begin();
+                entityManager.persist(utilisateurAModifier);
+                transaction.commit();
+                System.out.println("<----------- Mise a jour Utilisateur avec success ------->");
+                return true;
+
+            }
+            System.out.println("<----------- Utilisateur avec id non trouve ------->");
+            return false;
+
+        } catch (Exception ex) {
+            transaction.rollback();
+            System.out.println("Erreur mise a jour Utilisateur \n");
+            ex.printStackTrace();
+
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
+        }
+        return false;
+    }
 }

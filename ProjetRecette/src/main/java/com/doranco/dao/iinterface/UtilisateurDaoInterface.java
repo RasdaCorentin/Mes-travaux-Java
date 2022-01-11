@@ -24,9 +24,15 @@ public interface UtilisateurDaoInterface {
     //Compare le mdp pour le login
     boolean comparePassword(String passwordTemp, Utilisateur utilisateur);
     
-    //Lire un Utilisateur a partir de son ID
+    //Lire un Utilisateur a partir de son Nom
     Utilisateur findUtilisateurByNom(Utilisateur utilisateur);
+    //Lire un utilisateur à partir de son ID
+    Utilisateur findUtilisateurById(int id);
     
+    //Supprime un utilisateur (COMMAND ADMIN)
     boolean deleteUtilisateur(int id);
+    
+    //Modifie un utilisateur
+    boolean updateUtilisateur(Utilisateur utilisateur, int id);
     
 }

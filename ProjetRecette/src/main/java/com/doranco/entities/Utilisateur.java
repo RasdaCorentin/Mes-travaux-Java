@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -24,7 +25,7 @@ import javax.persistence.OneToMany;
 
 @Entity
 public class Utilisateur implements Serializable{
-    private static final long serialVersionUID = 1L;
+
     
     /*
     
@@ -42,6 +43,7 @@ public class Utilisateur implements Serializable{
     private String DateModif;
     private String salt;
     private String email;
+    private boolean statuts;
     @Enumerated(EnumType.STRING)
     private RoleUtilisateur role;
     
@@ -51,17 +53,25 @@ public class Utilisateur implements Serializable{
     
     */
     
-    @OneToMany(mappedBy = "utilisateur")
-    private List<Recette> listeRecettes = new ArrayList<>();
+    @OneToMany(mappedBy = "utilisateur", fetch = FetchType.EAGER)
+    private List<Recette> listeRecettes;
     
     /*
     
-    Booléen de vérification de rôle
+    Booléen de vérification de rôle & de statuts
     
     */
-    
+    /**
+     * @param statuts the statuts to set
+     */
+    public void setStatuts(boolean statuts) {
+        this.statuts = statuts;
+    }
     public boolean isAdmin(){
     return this.getRole().equals(RoleUtilisateur.ADMIN);
+    }
+    public boolean isUser(){
+    return this.getRole().equals(RoleUtilisateur.USER);
     }
         
     /*
@@ -256,4 +266,5 @@ public class Utilisateur implements Serializable{
     public void setListeRecettes(List<Recette> listeRecettes) {
         this.listeRecettes = listeRecettes;
     }
+
 }

@@ -4,7 +4,11 @@
  */
 package com.doranco.dao;
 
+import com.doranco.dao.iinterface.IngredientDaoInterface;
+import com.doranco.dao.iinterface.RecetteDaoInterface;
 import com.doranco.dao.iinterface.UtilisateurDaoInterface;
+import com.doranco.dao.imp.IngredientDaoImp;
+import com.doranco.dao.imp.RecetteDaoImp;
 import com.doranco.dao.imp.UtilisateurDaoImp;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -15,14 +19,19 @@ import javax.persistence.Persistence;
  * @author 33767
  */
 /*
-Outil merveilleux pour recycler son code. 
-10/01/22 10:30 Je vais ajouter Recette et Ingredients encore. On va d'abord tester l'utilisateur
-10/01/22 11:15 test ok deux utilisateurs enregistré 
-10/01/22 12:00 J'ai implémenter la fonction lister utilisateur en JSON
-               Je dois implémenter créer un utilisateur 
-10/01/22 15:17 Changement dans RequestFilter
-               Création Utilisateur à partir de 0
-10/01/22 15:34 premier tests heures creatioN OK
+Outil merveilleux pour recycler son code.
+OVERALL JE DOIS FAIRE LES AFFICHAGE EN FONCTION (pour l'instant affichage de type list utilisateur)
+USER    Mettre a jour son profil OK mais doit être personel
+        Creer un compte 0k 
+        Se Connecter    WIP doit ajouter methode actif
+        Créer une recette   ok only admin
+        Lister une recette ok only admin
+        Modifier ses recettes
+        Supprimer ses recettes
+
+ADMIN   Desactiver un utilisateur  OK mais je supprime l'utilisateur
+        Modifier des recettes
+        Supprimer des recettes
 
 */
 
@@ -43,5 +52,11 @@ public class DaoFactory {
     }
     public UtilisateurDaoInterface getUtilisateurDaoInterface(){
         return new UtilisateurDaoImp(this);
+    }
+    public RecetteDaoInterface getRecetteDaoInterface(){
+        return new RecetteDaoImp(this);
+    }
+    public IngredientDaoInterface getIngredientDaoInterface(){
+        return new IngredientDaoImp(this);
     }
 }

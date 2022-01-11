@@ -5,7 +5,6 @@
 package com.doranco.controllers;
 import com.doranco.dao.DaoFactory;
 import com.doranco.dao.iinterface.UtilisateurDaoInterface;
-import com.doranco.dao.imp.UtilisateurDaoImp;
 import com.doranco.entities.RoleUtilisateur;
 import com.doranco.entities.Utilisateur;
 import jakarta.ws.rs.Consumes;
@@ -18,14 +17,7 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
+
 
 
 /**
@@ -35,7 +27,14 @@ import javax.persistence.Query;
 
 @Path("/utilisateur") 
 public class UtilisateurController {
-
+    
+    
+//---------------------------------------------ADMIN COMMAND-------------------------------------------------
+/*
+--------------------------------------------------------------------------------------------------------------------------
+                                                 Liste Utilisateur avec DAO FACTORY 
+--------------------------------------------------------------------------------------------------------------------------
+*/
     @Path("/admin/liste")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -56,15 +55,21 @@ public class UtilisateurController {
         return response;
  }
     
-    @Path("admin/deleteU/{id}")
+    
+/*
+--------------------------------------------------------------------------------------------------------------------------
+                                                 Delete Utilisateur avec DAO FACTORY 
+--------------------------------------------------------------------------------------------------------------------------
+*/
+    @Path("/admin/deleteU/{id}")
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteUtilisateur(@PathParam(value = "id")int id){
     DaoFactory daoFactory = new DaoFactory();
        
-    UtilisateurDaoInterface ingredientDaoInterface = daoFactory.getUtilisateurDaoInterface();
+    UtilisateurDaoInterface UtilisateurDaoInterface = daoFactory.getUtilisateurDaoInterface();
        
-    ingredientDaoInterface.deleteUtilisateur(id);
+    UtilisateurDaoInterface.deleteUtilisateur(id);
     daoFactory.closeEntityManagerFactory();
     
     Response response = Response
@@ -73,9 +78,14 @@ public class UtilisateurController {
                 .build();
       return response;  
     }
-
-//    Crée un nouvel utilisateur si aucun enregistré
     
+    
+//---------------------------------------------ADMIN / NEW USER COMMAND-------------------------------------------------
+/*
+--------------------------------------------------------------------------------------------------------------------------
+                                                Création Utilisateur avec DAO FACTORY 
+--------------------------------------------------------------------------------------------------------------------------
+*/
     @Path("/enregistrez")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -99,83 +109,35 @@ public class UtilisateurController {
         
         return response;
     }
-//    
-//    @Path("/update/{id}")
-//    @PUT
-//    @Produces(MediaType.APPLICATION_JSON)
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    public Response updateUtilisateur(Utilisateur newUtilisateur, @PathParam(value = "id")int id){
-//
-//        
-//        //Filtrer la liste utilisateur pour obtenir utilisateur avec id passé en parametre
-//        
-//        List<Utilisateur> listeFiltree = utilisateurs.stream().filter(e -> e.getId()== id).collect(Collectors.toList());
-//        
-//        if(listeFiltree.isEmpty()){
-//
-//            return Response
-//                    .status(Response.Status.NOT_FOUND)
-//                    .entity("ID utilisateur non trouve")
-//                    .build();
-//
-//        }
-////        
-//        Utilisateur utilisateurTrouve = listeFiltree.get(0);
-//
-//        //Trouver l'emplacement de l'utilisateur dans la liste
-//        int indexOfUtilisateur = utilisateurs.indexOf(utilisateurTrouve);
-//
-//        utilisateurTrouve.setNom(newUtilisateur.getNom());
-//        utilisateurTrouve.setPrenom(newUtilisateur.getPrenom());
-//
-//        utilisateurs.set(indexOfUtilisateur, utilisateurTrouve);
-//        
-//        //Creation d'une réponse
-//        Response response = Response
-//                .status(Response.Status.CREATED)
-//                .entity(utilisateurs)
-//                .build();
-//        
-//        return response;
-//    }
-//    
-//    @Path("admin/delete/{id}")
-//    @DELETE
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public Response deleteUtilisateur(@PathParam(value = "id")int id){
-//        //Création des Utilisateur pour la liste
-//        Utilisateur utilisateur1 = new Utilisateur (1, "Chuck", "Norris");
-//        Utilisateur utilisateur2 = new Utilisateur (2, "John", "Lenon");
-//        
-//        //Création et ajout d'Utilisateur à la liste
-//        List<Utilisateur> utilisateurs = new ArrayList<>();
-//        utilisateurs.add(utilisateur2);
-//        utilisateurs.add(utilisateur1);
-//        
-//        //Filtrer la liste utilisateur pour obtenir utilisateur avec id passé en parametre
-//        
-//        List<Utilisateur> listeFiltree = utilisateurs.stream().filter(e -> e.getId()== id).collect(Collectors.toList());
-//        
-//        if(listeFiltree.isEmpty()){
-//            return Response
-//                    .status(Response.Status.NOT_FOUND)
-//                    .entity("ID utilisateur non trouve")
-//                    .build();
-//
-//        }
-//        
-//        Utilisateur utilisateurTrouve = listeFiltree.get(0);
-//        //Trouver l'emplacement de l'utilisateur dans la liste
-////        int indexOfUtilisateur = Utilisateurs.indexOf(UtilisateurTrouve);
-//        utilisateurs.remove(utilisateurTrouve);
-//        
-//        //Creation d'une réponse
-//        Response response = Response
-//                .status(Response.Status.CREATED)
-//                .entity(utilisateurs)
-//                .build();
-//        
-//        return response;
-//    }
+    
+    
+//---------------------------------------------ADMIN / USER COMMAND-------------------------------------------------
+/*
+--------------------------------------------------------------------------------------------------------------------------
+                                                Update Utilisateur avec DAO FACTORY 
+--------------------------------------------------------------------------------------------------------------------------
+*/    
+    @Path("/user/update/{id}")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateUtilisateur(Utilisateur utilisateur, @PathParam(value = "id")int id){
+
+
+       DaoFactory daoFactory = new DaoFactory();
+       
+       utilisateur = new Utilisateur(utilisateur.getNom(), utilisateur.getPassword(), RoleUtilisateur.USER, utilisateur.getEmail());
+       UtilisateurDaoInterface utilisateurDaoInterface = daoFactory.getUtilisateurDaoInterface();  
+       utilisateurDaoInterface.updateUtilisateur(utilisateur, id);       
+    
+        //Creation d'une réponse
+        Response response = Response
+                .status(Response.Status.CREATED)
+                .entity(utilisateurDaoInterface.getListeUtilisateurs())
+                .build();
+        
+        daoFactory.closeEntityManagerFactory();
+        return response;
+    }
 }
 

@@ -4,10 +4,10 @@
  */
 package com.doranco.entities;
 
+import javax.persistence.JoinColumn;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -46,9 +46,10 @@ public class Recette implements Serializable {
     */
     
     @ManyToOne()
+    @JoinColumn (name="utilisateur")
     private Utilisateur utilisateur;
-    @OneToMany(mappedBy = "recette")
-    private List<Ingredient> listeIngredients = new ArrayList<>();
+//    @OneToMany(mappedBy = "recette")
+//    private List<Ingredient> listeIngredients = new ArrayList<>();
     
     /*
         
@@ -202,18 +203,18 @@ public class Recette implements Serializable {
         this.utilisateur = utilisateur;
     }
 
-    /**
-     * @return the listeIngredients
-     */
-    public List<Ingredient> getListeIngredients() {
-        return listeIngredients;
-    }
-
-    /**
-     * @param listeIngredients the listeIngredients to set
-     */
-    public void setListeIngredients(List<Ingredient> listeIngredients) {
-        this.listeIngredients = listeIngredients;
-    }
+//    /**
+//     * @return the listeIngredients
+//     */
+//    public List<Ingredient> getListeIngredients() {
+//        return listeIngredients;
+//    }
+//
+//    /**
+//     * @param listeIngredients the listeIngredients to set
+//     */
+//    public void setListeIngredients(List<Ingredient> listeIngredients) {
+//        this.listeIngredients = listeIngredients;
+//    }
 
 }

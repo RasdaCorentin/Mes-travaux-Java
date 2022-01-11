@@ -39,8 +39,8 @@ public class Ingredient implements Serializable{
     
     */
     
-    @ManyToOne()
-    private Recette recette;
+//    @ManyToOne()
+//    private Recette recette;
     
     /*
         
@@ -167,17 +167,17 @@ public class Ingredient implements Serializable{
     
     */
     
-    /**
-     * @return the recette
-     */
-    public Recette getRecette() {
-        return recette;
-    }
-
-    /**
-     * @param recette the recette to set
-     */
-    public void setRecette(Recette recette) {
-        this.recette = recette;
-    }
+//    /**
+//     * @return the recette
+//     */
+//    public Recette getRecette() {
+//        return recette;
+//    }
+//
+//    /**
+//     * @param recette the recette to set
+//     */
+//    public void setRecette(Recette recette) {
+//        this.recette = recette;
+//    }
 }

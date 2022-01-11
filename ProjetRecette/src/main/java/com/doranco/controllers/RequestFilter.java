@@ -6,6 +6,7 @@ package com.doranco.controllers;
 
 import com.doranco.dao.DaoFactory;
 import com.doranco.dao.iinterface.UtilisateurDaoInterface;
+import com.doranco.entities.RoleUtilisateur;
 import com.doranco.entities.Utilisateur;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
@@ -22,26 +23,31 @@ import java.util.Base64;
 //A ajouter pour implémenter  les conditions
 @Provider
 public class RequestFilter implements ContainerRequestFilter {
-/*
+
+    /*
 --------------------------------------------------------------------------------------------------------------------------
                                               Verif Rôle Authentification 
 --------------------------------------------------------------------------------------------------------------------------
-*/
+     */
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
-        
-         System.out.println("Je prépare les autorisations...");
-         
-/*Je récupère la valeur de l'Authorization dans le Headers 
-et retire le basic ce qui me donne un code crypté que je décode*/
+        String urlPath = requestContext.getUriInfo().getPath();
 
-         String basicAuth = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
-         basicAuth = basicAuth.replace("Basic ", "");
-         String authDecode = new String(Base64.getDecoder().decode(basicAuth));
+        if (urlPath.contains("enregistrez")) {
+            return;
+        }
+
+        System.out.println("Je prépare les autorisations...");
+
+        /*Je récupère la valeur de l'Authorization dans le Headers 
+et retire le basic ce qui me donne un code crypté que je décode*/
+        String basicAuth = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
+        basicAuth = basicAuth.replace("Basic ", "");
+        String authDecode = new String(Base64.getDecoder().decode(basicAuth));
 //       System.out.println(authDecode);      
-         String[] credentials = authDecode.split(":");
-         String username = credentials[0];
-         String password = credentials[1];
+        String[] credentials = authDecode.split(":");
+        String username = credentials[0];
+        String password = credentials[1];
 
 
 /*J'enregistre le username et password 
@@ -50,37 +56,27 @@ S'il nous renvoie un utilisateur existant
 Si utilisateur ok utilisateur = utilisateur
 Sinon utilisateur == null
 alors je vérifie s'il est Admin*/
+        Utilisateur utilisateur = new Utilisateur(username, password);
+        DaoFactory daoFactory = new DaoFactory();
+        UtilisateurDaoInterface utilisateurDaoInterface = daoFactory.getUtilisateurDaoInterface();
+        utilisateur = utilisateurDaoInterface.loginUtilisateur(utilisateur);
 
-         Utilisateur utilisateur = new Utilisateur(username,password);
-         DaoFactory daoFactory = new DaoFactory();
-         UtilisateurDaoInterface utilisateurDaoInterface = daoFactory.getUtilisateurDaoInterface();
-         utilisateur = utilisateurDaoInterface.loginUtilisateur(utilisateur);
-         
 //Ici je créer les condition d'authentification,
 //J'ajoute une condition pour enregistrez les nouveau utilisateurs
 
-String urlPath = requestContext.getUriInfo().getPath();         
-         if((utilisateur != null)){
-             if(urlPath.contains("admin")){
-                 if (utilisateur.isAdmin()){
-                     return;
-                 }else{
-                     Response response = Response.status(Response.Status.FORBIDDEN).entity("T'es pas Admin COCO").build(); 
-                     requestContext.abortWith(response);
-                 }  
-             }
-             return;
-         }
-          if((utilisateur == null)){
-             if(urlPath.contains("enregistrez")){
-                     return;
-                 }else{
-                     Response response = Response.status(Response.Status.FORBIDDEN).entity("T'es pas COCO").build(); 
-                     requestContext.abortWith(response);
-                 }  
-             }
-         Response response = Response.status(Response.Status.FORBIDDEN).entity("Vous devez vous enreegistrez")
-         .build(); 
-         requestContext.abortWith(response);        
+        if ((utilisateur != null)) {
+            if (urlPath.contains("admin")) {
+                if (utilisateur.isAdmin()) {
+                    return;
+                } else {
+                    Response response = Response.status(Response.Status.FORBIDDEN).entity("T'es pas Admin COCO").build();
+                    requestContext.abortWith(response);
+                }
+            }
+            return;
+        }
+        Response response = Response.status(Response.Status.FORBIDDEN).entity("Vous devez vous enreegistrez")
+                .build();
+        requestContext.abortWith(response);
     }
 }
