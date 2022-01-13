@@ -26,13 +26,12 @@ public interface UtilisateurDaoInterface {
     //Creer un Utilisateur
     Utilisateur createUtilisateur(Utilisateur utilisateur);
     //Connecter un Utilisateur
-    Utilisateur connectUtilisateur(Utilisateur utilisateur, int id);    
+    Utilisateur connectUtilisateur(Utilisateur utilisateur);    
     
 //---------------------------------------------Outils------------------------------------------------- 
     
     //Compare les utilisateurs et le renvoie s'il existe
-    Utilisateur loginUtilisateur(Utilisateur utilisateur);
-    Utilisateur loginUtilisateur2(Utilisateur utilisateur, int id);    
+    Utilisateur loginUtilisateur(Utilisateur utilisateur);   
     //Compare le mdp pour le login
     boolean comparePassword(String passwordTemp, Utilisateur utilisateur);    
     //Lire un Utilisateur a partir de son Nom
@@ -43,5 +42,5 @@ public interface UtilisateurDaoInterface {
 //---------------------------------------------ADMIN / USER-------------------------------------------------
     
     //Modifie un utilisateur
-    boolean updateUtilisateur(Utilisateur utilisateur, int id);        
+    Utilisateur updateUtilisateur(Utilisateur utilisateur);        
 }

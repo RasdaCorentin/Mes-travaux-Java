@@ -20,28 +20,28 @@ import org.mindrot.jbcrypt.BCrypt;
  * @author 
  */
 public class UtilisateurDaoImp implements UtilisateurDaoInterface {
-    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
+
+    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
     LocalDateTime now = LocalDateTime.now();
-    
+
     private DaoFactory daoFactory;
-    
-    public UtilisateurDaoImp(DaoFactory daoFactory){
+
+    public UtilisateurDaoImp(DaoFactory daoFactory) {
         this.daoFactory = daoFactory;
     }
-    
-    
-/*
+
+    /*
 --------------------------------------------------------------------------------------------------------------------------
                                                  Liste Utilisateur avec DAO FACTORY 
 --------------------------------------------------------------------------------------------------------------------------
-*/    
+     */
 //Utilise Jquery pour avoir une liste d'utilisateur depuis la base de données
     @Override
     public List<Utilisateur> getListeUtilisateurs() {
-        
+
         EntityManager entityManager = null;
         List<Utilisateur> listeUtilisateurs = new ArrayList<>();
-       
+
         try {
 // ------------------------------------------------------------------------------------------- 
 
@@ -49,7 +49,7 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
 
             Query query = entityManager.createQuery("SELECT e FROM Utilisateur e", Utilisateur.class);
             listeUtilisateurs = query.getResultList();
-            
+
 // ---------------------------------------FIN--------------------------------------------------            
         } catch (Exception ex) {
 
@@ -63,26 +63,23 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
         }
         return listeUtilisateurs;
     }
-    
-    
-/*
+
+    /*
 --------------------------------------------------------------------------------------------------------------------------
                                                 Création Utilisateur avec DAO FACTORY 
 --------------------------------------------------------------------------------------------------------------------------
-*/
+     */
     @Override
     public Utilisateur createUtilisateur(Utilisateur utilisateur) {
-        
+
         EntityManager entityManager = null;
         EntityTransaction transaction = null;
-        
+
         try {
             entityManager = daoFactory.getEntityManager();
             transaction = entityManager.getTransaction();
-            
-// ------------------------------------------------------------------------------------------- 
-             
 
+// ------------------------------------------------------------------------------------------- 
             String salt = BCrypt.gensalt();
             String passwordHash = BCrypt.hashpw(utilisateur.getPassword(), salt);
             utilisateur.setDateCrea(dtf.format(now));
@@ -95,9 +92,8 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
             transaction.commit();
             System.out.println("<----------- Creation Utilisateur avec success ------->");
             return utilisateur;
- 
-// ---------------------------------------FIN-------------------------------------------------- 
 
+// ---------------------------------------FIN-------------------------------------------------- 
         } catch (Exception ex) {
             transaction.rollback();
             System.out.println("Erreur creation Utilisateur \n");
@@ -111,99 +107,83 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
         return null;
     }
 
-/*
+    /*
 --------------------------------------------------------------------------------------------------------------------------
                                                 Outils 
 --------------------------------------------------------------------------------------------------------------------------
-*/
+     */
     @Override
     public Utilisateur findUtilisateurByNom(Utilisateur utilisateur) {
-        EntityManager entityManager = null;            
-            entityManager = daoFactory.getEntityManager();
-            Query query = entityManager.createQuery("select util from Utilisateur util where nom=:nom");
-              query.setParameter("nom",utilisateur.getNom());             
-              if (query.getResultList().isEmpty()){
-                  System.out.println("Ce nom utilisateur n'existe pas");
-                  return null;}
-              utilisateur = (Utilisateur) query.getResultList().get(0);           
-              return utilisateur;}
-    
+        EntityManager entityManager = null;
+        entityManager = daoFactory.getEntityManager();
+        Query query = entityManager.createQuery("select util from Utilisateur util where nom=:nom");
+        query.setParameter("nom", utilisateur.getNom());
+        if (query.getResultList().isEmpty()) {
+            System.out.println("Ce nom utilisateur n'existe pas");
+            return null;
+        }
+        utilisateur = (Utilisateur) query.getResultList().get(0);
+        return utilisateur;
+    }
+
     @Override
     public Utilisateur findUtilisateurById(int id) {
         EntityManager entityManager = null;
-            Utilisateur utilisateur = new Utilisateur();
-            entityManager = daoFactory.getEntityManager();
-            Query query = entityManager.createQuery("select util from Utilisateur util where id=:id");
-              query.setParameter("id",id);             
-              if (query.getResultList().isEmpty()){
-                  System.out.println("Cet id utilisateur n'existe pas");
-                  return null;}
-              utilisateur = (Utilisateur) query.getResultList().get(0);           
-              return utilisateur;}
+        Utilisateur utilisateur = new Utilisateur();
+        entityManager = daoFactory.getEntityManager();
+        Query query = entityManager.createQuery("select util from Utilisateur util where id=:id");
+        query.setParameter("id", id);
+        if (query.getResultList().isEmpty()) {
+            System.out.println("Cet id utilisateur n'existe pas");
+            return null;
+        }
+        utilisateur = (Utilisateur) query.getResultList().get(0);
+        return utilisateur;
+    }
+
     /*
     login lié à la compare
-    */
-
+     */
     @Override
     public Utilisateur loginUtilisateur(Utilisateur utilisateur) {
         EntityManager entityManager = null;
-        
+
         entityManager = daoFactory.getEntityManager();
         String passwordTemp = utilisateur.getPassword();
-        
+
         utilisateur = findUtilisateurByNom(utilisateur);
-        if(utilisateur == null){
-         return null;   
+        if (utilisateur == null) {
+            return null;
         }
-        if(comparePassword(passwordTemp, utilisateur)){
+        if (comparePassword(passwordTemp, utilisateur)) {
             return utilisateur;
         }
-        
         return null;
     }
-    @Override
-    public Utilisateur loginUtilisateur2(Utilisateur utilisateur, int id) {
-        EntityManager entityManager = null;
-        
-        entityManager = daoFactory.getEntityManager();
-        String passwordTemp = utilisateur.getPassword();
-        
-        utilisateur = findUtilisateurById(id);
-        if(utilisateur == null){
-         return null;   
-        }
-        if(comparePassword(passwordTemp, utilisateur)){
-            return utilisateur;
-        }
-        
-        return null;
-        
-}
+
     @Override
     public boolean comparePassword(String passwordTemp, Utilisateur utilisateur) {
-     String passwordHash = BCrypt.hashpw(passwordTemp, utilisateur.getSalt());
-     if(passwordHash.compareTo(utilisateur.getPassword()) == 0){
-         return true;
-     }
-     return false;
+        String passwordHash = BCrypt.hashpw(passwordTemp, utilisateur.getSalt());
+        if (passwordHash.compareTo(utilisateur.getPassword()) == 0) {
+            return true;
+        }
+        return false;
     }
-    
-    
-/*
+
+    /*
 --------------------------------------------------------------------------------------------------------------------------
                                                  Delete Utilisateur avec DAO FACTORY 
 --------------------------------------------------------------------------------------------------------------------------
-*/    
+     */
     @Override
     public boolean deleteUtilisateur(int id) {
-        
+
         EntityManager entityManager = null;
         EntityTransaction transaction = null;
         try {
             entityManager = daoFactory.getEntityManager();
-            
-// -------------------------------------------------------------------------------------------
 
+// -------------------------------------------------------------------------------------------
             Utilisateur utilisateur = entityManager.find(Utilisateur.class, id);
             if (utilisateur != null) {
                 transaction = entityManager.getTransaction();
@@ -212,9 +192,8 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
                 entityManager.remove(utilisateur);
                 transaction.commit();
                 System.out.println("<-----------Supression avec success ------->");
-                
-// ---------------------------------------FIN-------------------------------------------------- 
 
+// ---------------------------------------FIN-------------------------------------------------- 
                 return true;
             }
             System.out.println("<----------- utilisateur avec id non trouve ------->");
@@ -232,49 +211,58 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
         }
         return false;
     }
-    
-    
-/*
+
+    /*
 --------------------------------------------------------------------------------------------------------------------------
-                                                Update Utilisateur avec DAO FACTORY 
+                                                Update Utilisateur 
 --------------------------------------------------------------------------------------------------------------------------
-*/    
+     */
     @Override
-    public boolean updateUtilisateur(Utilisateur utilisateur, int id) {
+    public Utilisateur updateUtilisateur(Utilisateur utilisateur) {
         EntityManager entityManager = null;
         EntityTransaction transaction = null;
         try {
             entityManager = daoFactory.getEntityManager();
-            System.out.println("------------------ DEBUT CHANGEMENT ---------");
 // -------------------------------------------------------------------------------------------
+/*
+Fonction filtre Comparaison de Mot de passe : //
+*/
+            //
+            String passwordTemp = utilisateur.getPassword();
 
-            utilisateur = entityManager.find(Utilisateur.class, id);
-            if (utilisateur != null) {
-                transaction = entityManager.getTransaction();
-                
-                String salt = BCrypt.gensalt();
-                String passwordHash = BCrypt.hashpw(utilisateur.getPassword(), salt);
-                
-                utilisateur.setDateModif(dtf.format(now));
-                utilisateur.setNom(utilisateur.getNom());
-                utilisateur.setEmail(utilisateur.getEmail());
-                utilisateur.setPassword(passwordHash);
-                
-// ---------------------------------------FIN--------------------------------------------------   
-                System.out.println("--------------------FIN CHANGEMENT-------------");
-                transaction.begin();
-                entityManager.persist(utilisateur);
-                transaction.commit();
-                System.out.println("<----------- Mise a jour Utilisateur avec success ------->");
-                return true;
+            //Recupr utilisateur              
+            Utilisateur utilisateurAModifier = findUtilisateurByNom(utilisateur);
+            if (utilisateurAModifier != null) {
+            transaction = entityManager.getTransaction();
+                //
+                String passwordHash = BCrypt.hashpw(passwordTemp, utilisateurAModifier.getSalt());
+                //
+                if (passwordHash.compareTo(utilisateurAModifier.getPassword()) == 0) {
 
+                    utilisateurAModifier.setDateModif(dtf.format(now));
+                    utilisateurAModifier.setDateModif(dtf.format(now));
+                    utilisateurAModifier.setNom(utilisateur.getNewNom());
+                    utilisateurAModifier.setEmail(utilisateur.getEmail());
+//                    utilisateurAModifier.setPassword(passwordHash);
+
+                    transaction.begin();
+                    entityManager.merge(utilisateurAModifier);
+                    transaction.commit();
+                    System.out.println("<----------- Mise a jour Utilisateur avec success ------->");
+                    return utilisateurAModifier;
+                }
+                //
+                System.out.println("<----------- Mot de passe incorrect ------->");
+                //
+                return utilisateur;
             }
-            System.out.println("<----------- Utilisateur avec id non trouve ------->");
-            return false;
+            System.out.println("<----------- Utilisateur avec Nom non trouve ------->");
+            return null;
 
+// ---------------------------------------FIN-------------------------------------------------- 
         } catch (Exception ex) {
             transaction.rollback();
-            System.out.println("Erreur mise a jour Utilisateur \n");
+            System.out.println("Erreur creation Utilisateur \n");
             ex.printStackTrace();
 
         } finally {
@@ -282,47 +270,45 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
                 entityManager.close();
             }
         }
-        return false;
+        return null;
     }
-/*
+
+    /*
 --------------------------------------------------------------------------------------------------------------------------
                                                 Deconnecter Utilisateur
 --------------------------------------------------------------------------------------------------------------------------
-*/
+     */
     @Override
-    @SuppressWarnings("null")
     public Utilisateur disconnectUtilisateur(Utilisateur utilisateur, int id) {
         EntityManager entityManager = null;
         EntityTransaction transaction = null;
         try {
             entityManager = daoFactory.getEntityManager();
-            
-            
+
             System.out.println("------------------ DEBUT CHANGEMENT ---------");
 // -------------------------------------------------------------------------------------------
 
             utilisateur = entityManager.find(Utilisateur.class, id);
-            if(utilisateur != null){
+            if (utilisateur != null) {
                 transaction = entityManager.getTransaction();
-                
+
                 String salt = BCrypt.gensalt();
                 String passwordHash = BCrypt.hashpw(utilisateur.getPassword(), salt);
-                
-            utilisateur.setPassword(passwordHash);    
-            utilisateur.setDateModif(dtf.format(now));
-            utilisateur.setStatuts(false);
-            
-            transaction.begin();
-            entityManager.persist(utilisateur);
-            transaction.commit();
-            System.out.println("<----------- Statut mis à jour ------->");
-            return utilisateur;
-        }
+
+                utilisateur.setPassword(passwordHash);
+                utilisateur.setDateModif(dtf.format(now));
+                utilisateur.setStatuts(false);
+
+                transaction.begin();
+                entityManager.persist(utilisateur);
+                transaction.commit();
+                System.out.println("<----------- Statut mis à jour ------->");
+                return utilisateur;
+            }
             System.out.println("<----------- Utilisateur avec id non trouve ------->");
             return null;
-                
-// ---------------------------------------FIN--------------------------------------------------   
 
+// ---------------------------------------FIN--------------------------------------------------   
         } catch (Exception ex) {
             transaction.rollback();
             System.out.println("Erreur désactivation Utilisateur \n");
@@ -332,38 +318,58 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
                 entityManager.close();
             }
         }
-   return null;
+        return null;
     }
-/*
+
+    /*
 --------------------------------------------------------------------------------------------------------------------------
                                                 Connecter Utilisateur
 --------------------------------------------------------------------------------------------------------------------------
-*/
+     */
     @Override
-    public Utilisateur connectUtilisateur(Utilisateur utilisateur, int id) {
-        
+    public Utilisateur connectUtilisateur(Utilisateur utilisateur) {
+
         EntityManager entityManager = null;
         EntityTransaction transaction = null;
-        
+
         try {
             entityManager = daoFactory.getEntityManager();
             transaction = entityManager.getTransaction();
-            
-// ------------------------------------------------------------------------------------------- 
 
-            utilisateur = loginUtilisateur2(utilisateur, id);
-            if(utilisateur != null){
-            utilisateur = entityManager.find(Utilisateur.class, id);
-            utilisateur.setDateModif(dtf.format(now));
-            utilisateur.setStatuts(true);
-            transaction.begin();
-            entityManager.persist(utilisateur);
-            transaction.commit();
-            System.out.println("<----------- Statut mis à jour ------->");
-            return utilisateur;}
+// ------------------------------------------------------------------------------------------- 
+/*
+Fonction filtre Comparaison de Mot de passe : //
+             */
+            //
+            String passwordTemp = utilisateur.getPassword();
+
+            //Recupr utilisateur              
+            Utilisateur nUtilisateur = findUtilisateurByNom(utilisateur);
+            if (nUtilisateur != null) {
+
+                //
+                String passwordHash = BCrypt.hashpw(passwordTemp, nUtilisateur.getSalt());
+                //
+                if (passwordHash.compareTo(nUtilisateur.getPassword()) == 0) {
+
+                    nUtilisateur.setDateModif(dtf.format(now));
+                    nUtilisateur.setStatuts(true);
+
+                    transaction.begin();
+                    entityManager.merge(nUtilisateur);
+                    transaction.commit();
+                    System.out.println("<----------- Statut mis à jour ------->");
+                    return nUtilisateur;
+                }
+                //
+                System.out.println("<----------- Mot de passe incorrect ------->");
+                //
+                return null;
+            }
+            System.out.println("<----------- Utilisateur avec Nom non trouve ------->");
+            return null;
 
 // ---------------------------------------FIN-------------------------------------------------- 
-
         } catch (Exception ex) {
             transaction.rollback();
             System.out.println("Erreur creation Utilisateur \n");

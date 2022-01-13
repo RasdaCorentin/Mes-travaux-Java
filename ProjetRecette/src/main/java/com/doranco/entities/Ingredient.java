@@ -28,7 +28,7 @@ public class Ingredient implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-    private String nom;
+    private String libelle;
     private String quantite;
     private String DateCrea;
     private String DateModif;
@@ -58,14 +58,18 @@ public class Ingredient implements Serializable{
         this.id = id;
     }
     // Constructeur sans id
-    public Ingredient(String nom, String quantite) {
-        this.nom = nom;
+    public Ingredient(String libelle, String quantite) {
+        this.libelle = libelle;
         this.quantite = quantite;
     }
+    //Constructeur libelle
+    public Ingredient(String libelle) {
+        this.libelle = libelle;
+    }
     //Constructeur complet
-    public Ingredient(int id, String nom, String quantite) {
+    public Ingredient(int id, String libelle, String quantite) {
         this.id = id;
-        this.nom = nom;
+        this.libelle = libelle;
         this.quantite = quantite;
     }
     
@@ -79,8 +83,8 @@ public class Ingredient implements Serializable{
     public String toString() {
             return "\n Id: "
                     + this.getId()
-                    + "\n Nom: "
-                    + this.getNom()
+                    + "\n Libelle: "
+                    + this.getLibelle()
                     + "\n Quantite: "
                     + this.getQuantite();
     }
@@ -104,21 +108,21 @@ public class Ingredient implements Serializable{
     public void setId(int id) {
         this.id = id;
     }
-
+    
     /**
-     * @return the nom
+     * @return the libelle
      */
-    public String getNom() {
-        return nom;
+    public String getLibelle() {
+        return libelle;
     }
 
     /**
-     * @param nom the nom to set
+     * @param libelle the libelle to set
      */
-    public void setNom(String nom) {
-        this.nom = nom;
+    public void setLibelle(String libelle) {
+        this.libelle = libelle;
     }
-
+ 
     /**
      * @return the quantite
      */
@@ -180,4 +184,6 @@ public class Ingredient implements Serializable{
     public void setRecette(Recette recette) {
         this.recette = recette;
     }
+
+
 }

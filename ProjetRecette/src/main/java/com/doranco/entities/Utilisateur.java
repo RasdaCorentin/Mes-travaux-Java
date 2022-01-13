@@ -41,12 +41,14 @@ public class Utilisateur implements Serializable{
     private int id;
     @Column(unique = true, nullable = false)
     private String nom;
+    private String newNom;
     private String password;
     private String DateCrea;
     private String DateModif;
     private String salt;
     private String email;
     private boolean statuts;
+
     @Enumerated(EnumType.STRING)
     private RoleUtilisateur role;
     
@@ -55,10 +57,9 @@ public class Utilisateur implements Serializable{
     Les relations
     
     */
-//    @JsonbTransient
     @Transient
     @OneToMany(mappedBy = "utilisateur")
-//    @OneToMany(mappedBy = "utilisateur", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+//  @OneToMany(mappedBy = "utilisateur", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Recette> listeRecettes = new ArrayList<>();
     
     /*
@@ -72,9 +73,11 @@ public class Utilisateur implements Serializable{
     public void setStatuts(boolean statuts) {
         this.statuts = statuts;
     }
+
     public boolean isAdmin(){
     return this.getRole().equals(RoleUtilisateur.ADMIN);
     }
+
     public boolean isUser(){
     return this.getRole().equals(RoleUtilisateur.USER);
     }
@@ -130,8 +133,26 @@ public class Utilisateur implements Serializable{
                     + this.getNom()
                     + "\n Password: "
                     + this.getPassword()
-                    + "\n Role: "
-                    + this.getRole();
+//                    + "\n Role: "
+//                    + this.getRole()
+                    + "\n Status: "
+                    + this.isStatuts()
+                    + "\n Date Creation: "
+                    + this.getDateCrea()
+                    + "\n Date Modification: "
+                    + this.getDateModif();
+        }
+    public String toString2() {
+            return "\n Nom: "
+                    + this.getNom()
+                    + "\n Email: "
+                    + this.getEmail()
+                    + "\n Status: "
+                    + this.isStatuts()
+                    + "\n Date Creation: "
+                    + this.getDateCrea()
+                    + "\n Date Modification: "
+                    + this.getDateModif();
         }
     
     /*
@@ -251,6 +272,25 @@ public class Utilisateur implements Serializable{
     public void setDateModif(String DateModif) {
         this.DateModif = DateModif;
     }
+    /**
+     * @return the statuts
+     */
+    public boolean isStatuts() {
+        return statuts;
+    }    
+    /**
+     * @return the newNom
+     */
+    public String getNewNom() {
+        return newNom;
+    }
+
+    /**
+     * @param newNom the newNom to set
+     */
+    public void setNewNom(String newNom) {
+        this.newNom = newNom;
+    }
     
     /*
     
@@ -271,5 +311,4 @@ public class Utilisateur implements Serializable{
     public void setListeRecettes(List<Recette> listeRecettes) {
         this.listeRecettes = listeRecettes;
     }
-
 }

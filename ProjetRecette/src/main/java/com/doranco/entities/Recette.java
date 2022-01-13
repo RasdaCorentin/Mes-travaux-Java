@@ -89,10 +89,18 @@ public class Recette implements Serializable {
     public String toString() {
             return "\n Id: "
                     + this.getId()
+                    + "\n Info Utilisateur: "
+                    + this.getUtilisateur()
                     + "\n Libelle: "
                     + this.getLibelle()
                     + "\n Description: "
-                    + this.getDescription();
+                    + this.getDescription()
+                    + "\n Date Creation: "
+                    + this.getDateCrea()
+                    + "\n Date Modification: "
+                    + this.getDateModif()
+                    + "\n Liste Ingredients: "
+                    + this.getListeIngredients();
     }
     
     /*

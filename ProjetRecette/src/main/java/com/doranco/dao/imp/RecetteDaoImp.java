@@ -5,9 +5,12 @@
 package com.doranco.dao.imp;
 
 import com.doranco.dao.DaoFactory;
+import com.doranco.dao.iinterface.IngredientDaoInterface;
 import com.doranco.dao.iinterface.RecetteDaoInterface;
+import com.doranco.dao.iinterface.UtilisateurDaoInterface;
 import com.doranco.entities.Ingredient;
 import com.doranco.entities.Recette;
+import com.doranco.entities.Utilisateur;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -24,12 +27,13 @@ import javax.persistence.Query;
 public class RecetteDaoImp implements RecetteDaoInterface {
     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
     LocalDateTime now = LocalDateTime.now();
-    
+    Ingredient ingredient = new Ingredient();
     private DaoFactory daoFactory;
     
     public RecetteDaoImp(DaoFactory daoFactory){
         this.daoFactory = daoFactory;
     }
+
     
     
 /*
@@ -73,7 +77,7 @@ public class RecetteDaoImp implements RecetteDaoInterface {
 --------------------------------------------------------------------------------------------------------------------------
 */
     @Override
-    public Recette createRecette(Recette recette) {
+    public Recette createRecette(Recette recette, Utilisateur utilisateur) {
         
         EntityManager entityManager = null;
         EntityTransaction transaction = null;
@@ -82,18 +86,34 @@ public class RecetteDaoImp implements RecetteDaoInterface {
             entityManager = daoFactory.getEntityManager();
             transaction = entityManager.getTransaction();
             
-// ------------------------------------------Methode-------------------------------------------------- 
-
+// ------------------------------------------Methode--------------------------------------------------              
+// Marche pour ajouter une recette / utilisateur
+            UtilisateurDaoInterface utilisateurDaoInterface = daoFactory.getUtilisateurDaoInterface();
+            utilisateur = utilisateurDaoInterface.findUtilisateurByNom(utilisateur);
+            
+            if (utilisateur != null) {
+            recette.setUtilisateur(utilisateur);
             recette.setDateCrea(dtf.format(now));
             recette.setDateModif(dtf.format(now));            
             recette.setLibelle(recette.getLibelle());
-            recette.setDescription(recette.getDescription());
+            recette.setDescription(recette.getDescription());           
+            
             transaction.begin();            
             entityManager.persist(recette);
+// Ajouter les ingredient
+            
+            List<Ingredient> listeIngredient = new ArrayList<>(recette.getListeIngredients());
+            IngredientDaoInterface ingredientDaoInterface = daoFactory.getIngredientDaoInterface();
+            Ingredient ingredient1 = new Ingredient();
+            //Je passe recette en parametre
+            ingredient1.setRecette(recette);
+            ingredient1 = ingredientDaoInterface.createIngredient(listeIngredient.get(0));
+            
+            entityManager.persist(ingredient1);
             transaction.commit();
             System.out.println("<----------- Creation Recette avec success ------->");
             return recette;
- 
+            }
 // ---------------------------------------FIN Methode-------------------------------------------------- 
 
         } catch (Exception ex) {
@@ -173,6 +193,7 @@ public class RecetteDaoImp implements RecetteDaoInterface {
                 recette.setDateModif(dtf.format(now));
                 recette.setLibelle(recette.getLibelle());
                 recette.setDescription(recette.getDescription());
+                
 // Ajouter les ingredients à modifier par ID 
 // ---------------------------------------FIN Methode--------------------------------------------------   
                 System.out.println("--------------------FIN CHANGEMENT-------------");

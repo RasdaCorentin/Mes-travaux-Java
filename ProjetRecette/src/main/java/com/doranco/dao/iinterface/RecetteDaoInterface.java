@@ -6,6 +6,7 @@ package com.doranco.dao.iinterface;
 
 import com.doranco.entities.Ingredient;
 import com.doranco.entities.Recette;
+import com.doranco.entities.Utilisateur;
 import java.util.List;
 
 /**
@@ -18,7 +19,7 @@ public interface RecetteDaoInterface {
     List<Recette> getListeRecettes();
     
     //Creer un Recette
-    Recette createRecette(Recette recette);
+    Recette createRecette(Recette recette, Utilisateur utilisateur);
     
     //Supprime un utilisateur (COMMAND ADMIN)
     boolean deleteRecette(int id);

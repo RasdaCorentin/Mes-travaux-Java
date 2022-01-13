@@ -85,8 +85,6 @@ public class IngredientDaoImp implements IngredientDaoInterface {
             ingredient.setDateCrea(dtf.format(now));
             ingredient.setDateModif(dtf.format(now));
 //  Il faut ajouter le nom de la ingredient lié à l'ingredient        
-            ingredient.setNom(ingredient.getNom());
-            ingredient.setQuantite(ingredient.getQuantite());
             
             transaction.begin();
             entityManager.persist(ingredient);

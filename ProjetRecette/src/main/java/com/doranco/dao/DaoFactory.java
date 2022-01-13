@@ -20,43 +20,41 @@ import javax.persistence.Persistence;
  */
 /*
 Outil merveilleux pour recycler son code.
-OVERALL JE DOIS FAIRE LES AFFICHAGE EN FONCTION (pour l'instant affichage de type list utilisateur)
-USER    Mettre a jour son profil OK mais doit être personel
-        Creer un compte 0k 
-        Se Connecter    WIP doit ajouter methode actif
-        Créer une recette   ok only admin
-        Lister une recette ok only admin
-        Modifier ses recettes ok only admin et pas "ses"
-        Supprimer ses recettes 
+USER  1 Créer une recette  
+      2 Lister les recettes 
+      4 Modifier ses recettes 
+      3 Supprimer ses recettes 
 
-ADMIN   Desactiver un utilisateur  OK mais je supprime l'utilisateur
-        Modifier des recettes OK
+ADMIN   Modifier des recettes 
         Supprimer des recettes 
 
-*/
-
+ */
 public class DaoFactory {
+
     private final EntityManagerFactory entityManagerFactory;
-    
+
     public DaoFactory() {
-        
+
         this.entityManagerFactory = Persistence.createEntityManagerFactory("projet-recette");
     }
-    
+
     public EntityManager getEntityManager() {
         return this.entityManagerFactory.createEntityManager();
     }
-    
+
     public void closeEntityManagerFactory() {
         this.entityManagerFactory.close();
     }
-    public UtilisateurDaoInterface getUtilisateurDaoInterface(){
+
+    public UtilisateurDaoInterface getUtilisateurDaoInterface() {
         return new UtilisateurDaoImp(this);
     }
-    public RecetteDaoInterface getRecetteDaoInterface(){
+
+    public RecetteDaoInterface getRecetteDaoInterface() {
         return new RecetteDaoImp(this);
     }
-    public IngredientDaoInterface getIngredientDaoInterface(){
+
+    public IngredientDaoInterface getIngredientDaoInterface() {
         return new IngredientDaoImp(this);
     }
 }
