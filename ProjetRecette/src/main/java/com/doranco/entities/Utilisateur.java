@@ -10,11 +10,13 @@ package com.doranco.entities;
  * @author 33767
  */
 
+import jakarta.json.bind.annotation.JsonbTransient;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -22,10 +24,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 
 @Entity
 public class Utilisateur implements Serializable{
-
+    private static long serialVersionUID = 1L;
     
     /*
     
@@ -52,9 +55,11 @@ public class Utilisateur implements Serializable{
     Les relations
     
     */
-    
-    @OneToMany(mappedBy = "utilisateur", fetch = FetchType.EAGER)
-    private List<Recette> listeRecettes;
+//    @JsonbTransient
+    @Transient
+    @OneToMany(mappedBy = "utilisateur")
+//    @OneToMany(mappedBy = "utilisateur", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<Recette> listeRecettes = new ArrayList<>();
     
     /*
     

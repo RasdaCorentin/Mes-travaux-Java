@@ -32,7 +32,7 @@ public class UtilisateurController {
 //---------------------------------------------ADMIN COMMAND-------------------------------------------------
 /*
 --------------------------------------------------------------------------------------------------------------------------
-                                                 Liste Utilisateur avec DAO FACTORY 
+                                                 Liste Utilisateur
 --------------------------------------------------------------------------------------------------------------------------
 */
     @Path("/admin/liste")
@@ -54,11 +54,34 @@ public class UtilisateurController {
         
         return response;
  }
-    
-    
 /*
 --------------------------------------------------------------------------------------------------------------------------
-                                                 Delete Utilisateur avec DAO FACTORY 
+                                                 Disconnect Utilisateur 
+--------------------------------------------------------------------------------------------------------------------------
+*/    
+    @Path("/admin/disconnect/{id}")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response disconnectUtilisateur(Utilisateur utilisateur, @PathParam(value = "id")int id){
+
+
+       DaoFactory daoFactory = new DaoFactory();
+       UtilisateurDaoInterface utilisateurDaoInterface = daoFactory.getUtilisateurDaoInterface();  
+       utilisateurDaoInterface.disconnectUtilisateur(utilisateur, id);       
+    
+        //Creation d'une réponse
+        Response response = Response
+                .status(Response.Status.CREATED)
+                .entity(utilisateurDaoInterface.getListeUtilisateurs())
+                .build();
+        
+        daoFactory.closeEntityManagerFactory();
+        return response;
+    }
+/*
+--------------------------------------------------------------------------------------------------------------------------
+                                                 Delete Utilisateur 
 --------------------------------------------------------------------------------------------------------------------------
 */
     @Path("/admin/deleteU/{id}")
@@ -83,7 +106,7 @@ public class UtilisateurController {
 //---------------------------------------------ADMIN / NEW USER COMMAND-------------------------------------------------
 /*
 --------------------------------------------------------------------------------------------------------------------------
-                                                Création Utilisateur avec DAO FACTORY 
+                                                Création Utilisateur
 --------------------------------------------------------------------------------------------------------------------------
 */
     @Path("/enregistrez")
@@ -93,28 +116,50 @@ public class UtilisateurController {
     public  Response createUtilisateur(Utilisateur utilisateur){
        DaoFactory daoFactory = new DaoFactory();
 //Je récupère ces infos depuis postman et le sutilise pour créer un nouvel utilisateur
-
-       Utilisateur Nutilisateur = new Utilisateur(utilisateur.getNom(), utilisateur.getPassword(), RoleUtilisateur.USER, utilisateur.getEmail()); 
+        utilisateur.setRole(RoleUtilisateur.USER);
        UtilisateurDaoInterface utilisateurDaoInterface = daoFactory.getUtilisateurDaoInterface();
-       Nutilisateur = utilisateurDaoInterface.createUtilisateur(Nutilisateur);
+       utilisateur = utilisateurDaoInterface.createUtilisateur(utilisateur);
        
          
         //Creation daoFactory.closeEntityManagerFactory();d'une réponse
         Response response = Response
                 .status(Response.Status.CREATED)
-                .entity(utilisateurDaoInterface.getListeUtilisateurs())
+                .entity("Bienvenue : " + utilisateur + "Tu dois maintenant te connecter")
                 .build();
         
         daoFactory.closeEntityManagerFactory();
         
         return response;
     }
-    
+/*
+--------------------------------------------------------------------------------------------------------------------------
+                                                Connecter Utilisateur
+--------------------------------------------------------------------------------------------------------------------------
+*/
+    @Path("/enregistrez/connect/{id}")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response connectUtilisateur(Utilisateur utilisateur, @PathParam(value = "id")int id){
+       DaoFactory daoFactory = new DaoFactory();
+
+       UtilisateurDaoInterface utilisateurDaoInterface = daoFactory.getUtilisateurDaoInterface();
+       utilisateur = utilisateurDaoInterface.connectUtilisateur(utilisateur, id);
+
+       //Creation d'une réponse
+        Response response = Response
+                .status(Response.Status.CREATED)
+                .entity("Bienvenue : " + utilisateur + "Tu peux maintenant publier tes recettes")
+                .build();
+        
+        daoFactory.closeEntityManagerFactory();        
+        return response;
+       }          
     
 //---------------------------------------------ADMIN / USER COMMAND-------------------------------------------------
 /*
 --------------------------------------------------------------------------------------------------------------------------
-                                                Update Utilisateur avec DAO FACTORY 
+                                                Update Utilisateur
 --------------------------------------------------------------------------------------------------------------------------
 */    
     @Path("/user/update/{id}")
@@ -125,8 +170,6 @@ public class UtilisateurController {
 
 
        DaoFactory daoFactory = new DaoFactory();
-       
-       utilisateur = new Utilisateur(utilisateur.getNom(), utilisateur.getPassword(), RoleUtilisateur.USER, utilisateur.getEmail());
        UtilisateurDaoInterface utilisateurDaoInterface = daoFactory.getUtilisateurDaoInterface();  
        utilisateurDaoInterface.updateUtilisateur(utilisateur, id);       
     

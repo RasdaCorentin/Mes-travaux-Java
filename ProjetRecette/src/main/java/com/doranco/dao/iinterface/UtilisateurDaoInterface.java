@@ -12,27 +12,36 @@ import java.util.List;
  * @author 33767
  */
 public interface UtilisateurDaoInterface {
+//---------------------------------------------ADMIN COMMAND------------------------------------------------- 
     
     //Lister tout les Utilisateur
     List<Utilisateur> getListeUtilisateurs();
+    //Deconnecter un utilisateur
+    Utilisateur disconnectUtilisateur(Utilisateur utilisateur, int id);
+    //Supprime un utilisateur 
+    boolean deleteUtilisateur(int id); 
+    
+//----------------------------------ADMIN/NEW USER COMMAND (A interdire aux user)-----------------
     
     //Creer un Utilisateur
     Utilisateur createUtilisateur(Utilisateur utilisateur);
+    //Connecter un Utilisateur
+    Utilisateur connectUtilisateur(Utilisateur utilisateur, int id);    
+    
+//---------------------------------------------Outils------------------------------------------------- 
     
     //Compare les utilisateurs et le renvoie s'il existe
     Utilisateur loginUtilisateur(Utilisateur utilisateur);
+    Utilisateur loginUtilisateur2(Utilisateur utilisateur, int id);    
     //Compare le mdp pour le login
-    boolean comparePassword(String passwordTemp, Utilisateur utilisateur);
-    
+    boolean comparePassword(String passwordTemp, Utilisateur utilisateur);    
     //Lire un Utilisateur a partir de son Nom
-    Utilisateur findUtilisateurByNom(Utilisateur utilisateur);
+    Utilisateur findUtilisateurByNom(Utilisateur utilisateur);    
     //Lire un utilisateur à partir de son ID
-    Utilisateur findUtilisateurById(int id);
+    Utilisateur findUtilisateurById(int id);  
     
-    //Supprime un utilisateur (COMMAND ADMIN)
-    boolean deleteUtilisateur(int id);
+//---------------------------------------------ADMIN / USER-------------------------------------------------
     
     //Modifie un utilisateur
-    boolean updateUtilisateur(Utilisateur utilisateur, int id);
-    
+    boolean updateUtilisateur(Utilisateur utilisateur, int id);        
 }

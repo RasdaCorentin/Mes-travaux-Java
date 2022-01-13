@@ -6,8 +6,8 @@ package com.doranco.dao.imp;
 
 import com.doranco.dao.DaoFactory;
 import com.doranco.dao.iinterface.RecetteDaoInterface;
+import com.doranco.entities.Ingredient;
 import com.doranco.entities.Recette;
-import com.doranco.entities.Utilisateur;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -15,6 +15,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
+
 
 
 /*
@@ -84,12 +85,10 @@ public class RecetteDaoImp implements RecetteDaoInterface {
 // ------------------------------------------Methode-------------------------------------------------- 
 
             recette.setDateCrea(dtf.format(now));
-            recette.setDateModif(dtf.format(now));
-//  Il faut aussi ajouter les ingredients
+            recette.setDateModif(dtf.format(now));            
             recette.setLibelle(recette.getLibelle());
             recette.setDescription(recette.getDescription());
-            
-            transaction.begin();
+            transaction.begin();            
             entityManager.persist(recette);
             transaction.commit();
             System.out.println("<----------- Creation Recette avec success ------->");
@@ -109,15 +108,96 @@ public class RecetteDaoImp implements RecetteDaoInterface {
         }
         return null;
     }
-
+/*
+--------------------------------------------------------------------------------------------------------------------------
+                                                 Delete Recette avec DAO FACTORY 
+--------------------------------------------------------------------------------------------------------------------------
+*/    
     @Override
     public boolean deleteRecette(int id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+        
+        EntityManager entityManager = null;
+        EntityTransaction transaction = null;
+        try {
+            entityManager = daoFactory.getEntityManager();
+            
+// ------------------------------------------Methode--------------------------------------------------
 
+            Recette recette = entityManager.find(Recette.class, id);
+            if (recette != null) {
+                transaction = entityManager.getTransaction();
+
+                transaction.begin();
+                entityManager.remove(recette);
+                transaction.commit();
+                System.out.println("<-----------Supression avec success ------->");
+                
+// ---------------------------------------FIN Methode-------------------------------------------------- 
+
+                return true;
+            }
+            System.out.println("<----------- Recette avec id non trouve ------->");
+            return false;
+
+        } catch (Exception ex) {
+            transaction.rollback();
+            System.out.println("Erreur mise a jour Recette \n");
+            ex.printStackTrace();
+
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
+        }
+        return false;
+    }
+/*
+--------------------------------------------------------------------------------------------------------------------------
+                                                Update Recette avec DAO FACTORY 
+--------------------------------------------------------------------------------------------------------------------------
+*/
     @Override
     public boolean updateRecette(Recette recette, int id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+        EntityManager entityManager = null;
+        EntityTransaction transaction = null;
+        try {
+            entityManager = daoFactory.getEntityManager();
+            System.out.println("------------------ DEBUT CHANGEMENT ---------");
+// ------------------------------------------Methode--------------------------------------------------
+
+            recette = entityManager.find(Recette.class, id);
+            if (recette != null) {
+                transaction = entityManager.getTransaction();
+                                                
+                recette.setDateModif(dtf.format(now));
+                recette.setLibelle(recette.getLibelle());
+                recette.setDescription(recette.getDescription());
+// Ajouter les ingredients à modifier par ID 
+// ---------------------------------------FIN Methode--------------------------------------------------   
+                System.out.println("--------------------FIN CHANGEMENT-------------");
+                transaction.begin();
+                entityManager.persist(recette);
+                transaction.commit();
+                System.out.println("<----------- Mise a jour Recette avec success ------->");
+                return true;
+
+            }
+            System.out.println("<----------- Recette avec id non trouve ------->");
+            return false;
+
+        } catch (Exception ex) {
+            transaction.rollback();
+            System.out.println("Erreur mise a jour recette \n");
+            ex.printStackTrace();
+
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
+        }
+        return false;
     }
+    
 
 }

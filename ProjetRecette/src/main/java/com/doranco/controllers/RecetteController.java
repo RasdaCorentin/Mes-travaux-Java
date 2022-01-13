@@ -7,18 +7,21 @@ package com.doranco.controllers;
 import com.doranco.dao.DaoFactory;
 import com.doranco.dao.iinterface.RecetteDaoInterface;
 import com.doranco.dao.iinterface.UtilisateurDaoInterface;
+import com.doranco.entities.Ingredient;
 import com.doranco.entities.Recette;
 import com.doranco.entities.Utilisateur;
-
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.util.List;
 
 
 /**
@@ -31,7 +34,7 @@ public class RecetteController {
 
 /*
 --------------------------------------------------------------------------------------------------------------------------
-                                                 Liste Recette avec DAO FACTORY 
+                                                 Liste Recette
 --------------------------------------------------------------------------------------------------------------------------
 */
     @Path("/admin/liste")
@@ -56,7 +59,7 @@ public class RecetteController {
     
 /*
 --------------------------------------------------------------------------------------------------------------------------
-                                                Création Recette avec DAO FACTORY 
+                                                Création Recette
 --------------------------------------------------------------------------------------------------------------------------
 */
     @Path("/admin/create/{id}")
@@ -67,22 +70,72 @@ public class RecetteController {
         
         
        DaoFactory daoFactory = new DaoFactory();
-       RecetteDaoInterface recetteDaoInterface = daoFactory.getRecetteDaoInterface();
-       UtilisateurDaoInterface utilisateurDaoInterface = daoFactory.getUtilisateurDaoInterface();
-        
-       Utilisateur utilisateur = utilisateurDaoInterface.findUtilisateurById(id);
-       Recette nRecette = new Recette(recette.getLibelle(), recette.getDescription()); 
-       recette.setUtilisateur(utilisateur);
        
-       nRecette = recetteDaoInterface.createRecette(nRecette);  
+       RecetteDaoInterface recetteDaoInterface = daoFactory.getRecetteDaoInterface();
+       UtilisateurDaoInterface utilisateurDaoInterface = daoFactory.getUtilisateurDaoInterface(); 
+       
+       
+       recette.setListeIngredients(recette.getListeIngredients());
+       Utilisateur utilisateur = utilisateurDaoInterface.findUtilisateurById(id);
+       recette.setUtilisateur(utilisateur);
+       recette = recetteDaoInterface.createRecette(recette);
+       
+         
 //Creation d'une réponse
         Response response = Response
                 .status(Response.Status.CREATED)
-                .entity(utilisateur)
+                .entity(recette)
                 .build();
         
         daoFactory.closeEntityManagerFactory();
         
         return response;
+    }
+/*
+--------------------------------------------------------------------------------------------------------------------------
+                                                Update Recette 
+--------------------------------------------------------------------------------------------------------------------------
+*/    
+    @Path("/admin/update/{id}")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateRecette(Recette recette, @PathParam(value = "id")int id){
+
+
+       DaoFactory daoFactory = new DaoFactory();
+       RecetteDaoInterface recetteDaoInterface = daoFactory.getRecetteDaoInterface();  
+       recetteDaoInterface.updateRecette(recette, id);       
+    
+        //Creation d'une réponse
+        Response response = Response
+                .status(Response.Status.CREATED)
+                .entity(recette)
+                .build();
+        
+        daoFactory.closeEntityManagerFactory();
+        return response;
+    }
+    /*
+--------------------------------------------------------------------------------------------------------------------------
+                                                 Delete Recette avec DAO FACTORY 
+--------------------------------------------------------------------------------------------------------------------------
+*/
+    @Path("/admin/delete/{id}")
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteRecette(@PathParam(value = "id")int id){
+    DaoFactory daoFactory = new DaoFactory();
+       
+    RecetteDaoInterface RecetteDaoInterface = daoFactory.getRecetteDaoInterface();
+       
+    RecetteDaoInterface.deleteRecette(id);
+    daoFactory.closeEntityManagerFactory();
+    
+    Response response = Response
+                .status(Response.Status.CREATED)
+                .entity("Recette id :" + id + " Supprimé")
+                .build();
+      return response;  
     }
 }

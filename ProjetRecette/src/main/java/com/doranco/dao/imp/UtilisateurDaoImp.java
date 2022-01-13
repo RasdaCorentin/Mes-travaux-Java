@@ -43,14 +43,14 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
         List<Utilisateur> listeUtilisateurs = new ArrayList<>();
        
         try {
-// ------------------------------------------Methode-------------------------------------------------- 
+// ------------------------------------------------------------------------------------------- 
 
             entityManager = daoFactory.getEntityManager();
 
             Query query = entityManager.createQuery("SELECT e FROM Utilisateur e", Utilisateur.class);
             listeUtilisateurs = query.getResultList();
             
-// ---------------------------------------FIN Methode--------------------------------------------------            
+// ---------------------------------------FIN--------------------------------------------------            
         } catch (Exception ex) {
 
             System.out.println("Erreur lister Utilisateurs \n" + ex);
@@ -80,7 +80,7 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
             entityManager = daoFactory.getEntityManager();
             transaction = entityManager.getTransaction();
             
-// ------------------------------------------Methode-------------------------------------------------- 
+// ------------------------------------------------------------------------------------------- 
              
 
             String salt = BCrypt.gensalt();
@@ -89,14 +89,14 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
             utilisateur.setDateModif(dtf.format(now));
             utilisateur.setPassword(passwordHash);
             utilisateur.setSalt(salt);
-            utilisateur.setStatuts(true);
+            utilisateur.setStatuts(false);
             transaction.begin();
             entityManager.persist(utilisateur);
             transaction.commit();
             System.out.println("<----------- Creation Utilisateur avec success ------->");
             return utilisateur;
  
-// ---------------------------------------FIN Methode-------------------------------------------------- 
+// ---------------------------------------FIN-------------------------------------------------- 
 
         } catch (Exception ex) {
             transaction.rollback();
@@ -110,8 +110,7 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
         }
         return null;
     }
-    
-    
+
 /*
 --------------------------------------------------------------------------------------------------------------------------
                                                 Outils 
@@ -121,13 +120,14 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
     public Utilisateur findUtilisateurByNom(Utilisateur utilisateur) {
         EntityManager entityManager = null;            
             entityManager = daoFactory.getEntityManager();
-            Query query = entityManager.createQuery("select util from Utilisateur util where nom=:username");
-              query.setParameter("username",utilisateur.getNom());             
+            Query query = entityManager.createQuery("select util from Utilisateur util where nom=:nom");
+              query.setParameter("nom",utilisateur.getNom());             
               if (query.getResultList().isEmpty()){
                   System.out.println("Ce nom utilisateur n'existe pas");
                   return null;}
               utilisateur = (Utilisateur) query.getResultList().get(0);           
               return utilisateur;}
+    
     @Override
     public Utilisateur findUtilisateurById(int id) {
         EntityManager entityManager = null;
@@ -141,7 +141,7 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
               utilisateur = (Utilisateur) query.getResultList().get(0);           
               return utilisateur;}
     /*
-    Methode login lié à la methode compare
+    login lié à la compare
     */
 
     @Override
@@ -150,6 +150,7 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
         
         entityManager = daoFactory.getEntityManager();
         String passwordTemp = utilisateur.getPassword();
+        
         utilisateur = findUtilisateurByNom(utilisateur);
         if(utilisateur == null){
          return null;   
@@ -159,21 +160,24 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
         }
         
         return null;
+    }
+    @Override
+    public Utilisateur loginUtilisateur2(Utilisateur utilisateur, int id) {
+        EntityManager entityManager = null;
         
-        //Vérifie présence utilisateur
-//        entityManager = daoFactory.getEntityManager();
-//        
-//        Query query = entityManager.createQuery("SELECT u from Utilisateur u WHERE u.nom = '" + utilisateur.getNom() + "' AND u.password = '" + utilisateur.getPassword() + "'");
-//        
-//        if(query.getResultList().isEmpty()){
-//            System.out.println("Aucun utilisateur trouvé");
-//            return null;
-//        
-//    }
-//    utilisateur = (Utilisateur) query.getResultList().get(0);
-//    utilisateur.setPassword(null);
-//        System.out.println("Utilisateur Existe : " + utilisateur );
-//    return utilisateur;
+        entityManager = daoFactory.getEntityManager();
+        String passwordTemp = utilisateur.getPassword();
+        
+        utilisateur = findUtilisateurById(id);
+        if(utilisateur == null){
+         return null;   
+        }
+        if(comparePassword(passwordTemp, utilisateur)){
+            return utilisateur;
+        }
+        
+        return null;
+        
 }
     @Override
     public boolean comparePassword(String passwordTemp, Utilisateur utilisateur) {
@@ -198,18 +202,18 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
         try {
             entityManager = daoFactory.getEntityManager();
             
-// ------------------------------------------Methode--------------------------------------------------
+// -------------------------------------------------------------------------------------------
 
-            Utilisateur utilisateurAModifier = entityManager.find(Utilisateur.class, id);
-            if (utilisateurAModifier != null) {
+            Utilisateur utilisateur = entityManager.find(Utilisateur.class, id);
+            if (utilisateur != null) {
                 transaction = entityManager.getTransaction();
 
                 transaction.begin();
-                entityManager.remove(utilisateurAModifier);
+                entityManager.remove(utilisateur);
                 transaction.commit();
                 System.out.println("<-----------Supression avec success ------->");
                 
-// ---------------------------------------FIN Methode-------------------------------------------------- 
+// ---------------------------------------FIN-------------------------------------------------- 
 
                 return true;
             }
@@ -242,24 +246,24 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
         try {
             entityManager = daoFactory.getEntityManager();
             System.out.println("------------------ DEBUT CHANGEMENT ---------");
-// ------------------------------------------Methode--------------------------------------------------
+// -------------------------------------------------------------------------------------------
 
-            Utilisateur utilisateurAModifier = entityManager.find(Utilisateur.class, id);
-            if (utilisateurAModifier != null) {
+            utilisateur = entityManager.find(Utilisateur.class, id);
+            if (utilisateur != null) {
                 transaction = entityManager.getTransaction();
                 
                 String salt = BCrypt.gensalt();
                 String passwordHash = BCrypt.hashpw(utilisateur.getPassword(), salt);
                 
-                utilisateurAModifier.setDateModif(dtf.format(now));
-                utilisateurAModifier.setNom(utilisateur.getNom());
-                utilisateurAModifier.setEmail(utilisateur.getEmail());
-                utilisateurAModifier.setPassword(passwordHash);
+                utilisateur.setDateModif(dtf.format(now));
+                utilisateur.setNom(utilisateur.getNom());
+                utilisateur.setEmail(utilisateur.getEmail());
+                utilisateur.setPassword(passwordHash);
                 
-// ---------------------------------------FIN Methode--------------------------------------------------   
+// ---------------------------------------FIN--------------------------------------------------   
                 System.out.println("--------------------FIN CHANGEMENT-------------");
                 transaction.begin();
-                entityManager.persist(utilisateurAModifier);
+                entityManager.persist(utilisateur);
                 transaction.commit();
                 System.out.println("<----------- Mise a jour Utilisateur avec success ------->");
                 return true;
@@ -279,5 +283,97 @@ public class UtilisateurDaoImp implements UtilisateurDaoInterface {
             }
         }
         return false;
+    }
+/*
+--------------------------------------------------------------------------------------------------------------------------
+                                                Deconnecter Utilisateur
+--------------------------------------------------------------------------------------------------------------------------
+*/
+    @Override
+    @SuppressWarnings("null")
+    public Utilisateur disconnectUtilisateur(Utilisateur utilisateur, int id) {
+        EntityManager entityManager = null;
+        EntityTransaction transaction = null;
+        try {
+            entityManager = daoFactory.getEntityManager();
+            
+            
+            System.out.println("------------------ DEBUT CHANGEMENT ---------");
+// -------------------------------------------------------------------------------------------
+
+            utilisateur = entityManager.find(Utilisateur.class, id);
+            if(utilisateur != null){
+                transaction = entityManager.getTransaction();
+                
+                String salt = BCrypt.gensalt();
+                String passwordHash = BCrypt.hashpw(utilisateur.getPassword(), salt);
+                
+            utilisateur.setPassword(passwordHash);    
+            utilisateur.setDateModif(dtf.format(now));
+            utilisateur.setStatuts(false);
+            
+            transaction.begin();
+            entityManager.persist(utilisateur);
+            transaction.commit();
+            System.out.println("<----------- Statut mis à jour ------->");
+            return utilisateur;
+        }
+            System.out.println("<----------- Utilisateur avec id non trouve ------->");
+            return null;
+                
+// ---------------------------------------FIN--------------------------------------------------   
+
+        } catch (Exception ex) {
+            transaction.rollback();
+            System.out.println("Erreur désactivation Utilisateur \n");
+            ex.printStackTrace();
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
+        }
+   return null;
+    }
+/*
+--------------------------------------------------------------------------------------------------------------------------
+                                                Connecter Utilisateur
+--------------------------------------------------------------------------------------------------------------------------
+*/
+    @Override
+    public Utilisateur connectUtilisateur(Utilisateur utilisateur, int id) {
+        
+        EntityManager entityManager = null;
+        EntityTransaction transaction = null;
+        
+        try {
+            entityManager = daoFactory.getEntityManager();
+            transaction = entityManager.getTransaction();
+            
+// ------------------------------------------------------------------------------------------- 
+
+            utilisateur = loginUtilisateur2(utilisateur, id);
+            if(utilisateur != null){
+            utilisateur = entityManager.find(Utilisateur.class, id);
+            utilisateur.setDateModif(dtf.format(now));
+            utilisateur.setStatuts(true);
+            transaction.begin();
+            entityManager.persist(utilisateur);
+            transaction.commit();
+            System.out.println("<----------- Statut mis à jour ------->");
+            return utilisateur;}
+
+// ---------------------------------------FIN-------------------------------------------------- 
+
+        } catch (Exception ex) {
+            transaction.rollback();
+            System.out.println("Erreur creation Utilisateur \n");
+            ex.printStackTrace();
+
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
+        }
+        return null;
     }
 }

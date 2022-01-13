@@ -26,12 +26,12 @@ USER    Mettre a jour son profil OK mais doit être personel
         Se Connecter    WIP doit ajouter methode actif
         Créer une recette   ok only admin
         Lister une recette ok only admin
-        Modifier ses recettes
-        Supprimer ses recettes
+        Modifier ses recettes ok only admin et pas "ses"
+        Supprimer ses recettes 
 
 ADMIN   Desactiver un utilisateur  OK mais je supprime l'utilisateur
-        Modifier des recettes
-        Supprimer des recettes
+        Modifier des recettes OK
+        Supprimer des recettes 
 
 */
 

@@ -46,7 +46,7 @@ et retire le basic ce qui me donne un code crypté que je décode*/
         String authDecode = new String(Base64.getDecoder().decode(basicAuth));
 //       System.out.println(authDecode);      
         String[] credentials = authDecode.split(":");
-        String username = credentials[0];
+        String nom = credentials[0];
         String password = credentials[1];
 
 
@@ -56,7 +56,7 @@ S'il nous renvoie un utilisateur existant
 Si utilisateur ok utilisateur = utilisateur
 Sinon utilisateur == null
 alors je vérifie s'il est Admin*/
-        Utilisateur utilisateur = new Utilisateur(username, password);
+        Utilisateur utilisateur = new Utilisateur(nom, password);
         DaoFactory daoFactory = new DaoFactory();
         UtilisateurDaoInterface utilisateurDaoInterface = daoFactory.getUtilisateurDaoInterface();
         utilisateur = utilisateurDaoInterface.loginUtilisateur(utilisateur);
