@@ -19,35 +19,32 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
-
-
 /*
  * @author 
  */
 public class RecetteDaoImp implements RecetteDaoInterface {
-    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
+
+    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
     LocalDateTime now = LocalDateTime.now();
     Ingredient ingredient = new Ingredient();
     private DaoFactory daoFactory;
-    
-    public RecetteDaoImp(DaoFactory daoFactory){
+
+    public RecetteDaoImp(DaoFactory daoFactory) {
         this.daoFactory = daoFactory;
     }
 
-    
-    
-/*
+    /*
 --------------------------------------------------------------------------------------------------------------------------
                                                  Liste Recette avec DAO FACTORY 
 --------------------------------------------------------------------------------------------------------------------------
-*/    
+     */
 //Utilise Jquery pour avoir une liste d'recette depuis la base de données
     @Override
     public List<Recette> getListeRecettes() {
-        
+
         EntityManager entityManager = null;
         List<Recette> listeRecettes = new ArrayList<>();
-       
+
         try {
 // ------------------------------------------Methode-------------------------------------------------- 
 
@@ -55,7 +52,7 @@ public class RecetteDaoImp implements RecetteDaoInterface {
 
             Query query = entityManager.createQuery("SELECT e FROM Recette e", Recette.class);
             listeRecettes = query.getResultList();
-            
+
 // ---------------------------------------FIN Methode--------------------------------------------------            
         } catch (Exception ex) {
 
@@ -69,50 +66,52 @@ public class RecetteDaoImp implements RecetteDaoInterface {
         }
         return listeRecettes;
     }
-    
-    
-/*
+
+    /*
 --------------------------------------------------------------------------------------------------------------------------
                                                 Création Recette avec DAO FACTORY 
 --------------------------------------------------------------------------------------------------------------------------
-*/
+     */
     @Override
     public Recette createRecette(Recette recette, Utilisateur utilisateur) {
-        
+
         EntityManager entityManager = null;
         EntityTransaction transaction = null;
-        
+
         try {
             entityManager = daoFactory.getEntityManager();
             transaction = entityManager.getTransaction();
-            
+
 // ------------------------------------------Methode--------------------------------------------------              
 // Marche pour ajouter une recette / utilisateur
             UtilisateurDaoInterface utilisateurDaoInterface = daoFactory.getUtilisateurDaoInterface();
             utilisateur = utilisateurDaoInterface.findUtilisateurByNom(utilisateur);
-            
+
             if (utilisateur != null) {
-            recette.setUtilisateur(utilisateur);
-            recette.setDateCrea(dtf.format(now));
-            recette.setDateModif(dtf.format(now));            
-            recette.setLibelle(recette.getLibelle());
-            recette.setDescription(recette.getDescription());           
-            
-            transaction.begin();            
-            entityManager.persist(recette);
-// Ajouter les ingredient
-            
-            List<Ingredient> listeIngredient = new ArrayList<>(recette.getListeIngredients());
-            IngredientDaoInterface ingredientDaoInterface = daoFactory.getIngredientDaoInterface();
-            Ingredient ingredient1 = new Ingredient();
-            //Je passe recette en parametre
-            ingredient1.setRecette(recette);
-            ingredient1 = ingredientDaoInterface.createIngredient(listeIngredient.get(0));
-            
-            entityManager.persist(ingredient1);
-            transaction.commit();
-            System.out.println("<----------- Creation Recette avec success ------->");
-            return recette;
+                //Start transaction
+                transaction.begin();
+//          Ajouter les ingredient
+
+                List<Ingredient> listeIngredient = new ArrayList<>(recette.getListeIngredients());
+                IngredientDaoInterface ingredientDaoInterface = daoFactory.getIngredientDaoInterface();
+                for (int index = 0; index < listeIngredient.size(); index++) {
+                    Ingredient ingredient = listeIngredient.get(index);
+                    ingredient.setRecette(recette);
+                    System.out.println(ingredient);
+                    ingredient = ingredientDaoInterface.createIngredient(ingredient);
+                    entityManager.persist(ingredient);
+                }
+
+//          Ajouter la recette           
+                recette.setUtilisateur(utilisateur);
+                recette.setDateCrea(dtf.format(now));
+                recette.setDateModif(dtf.format(now));
+
+                entityManager.persist(recette);
+
+                transaction.commit();
+                System.out.println("<----------- Creation Recette avec success ------->");
+                return recette;
             }
 // ---------------------------------------FIN Methode-------------------------------------------------- 
 
@@ -128,97 +127,26 @@ public class RecetteDaoImp implements RecetteDaoInterface {
         }
         return null;
     }
-/*
+
+
+    /*
 --------------------------------------------------------------------------------------------------------------------------
-                                                 Delete Recette avec DAO FACTORY 
+                                                Outils 
 --------------------------------------------------------------------------------------------------------------------------
-*/    
+     */
     @Override
-    public boolean deleteRecette(int id) {
-        
+    public Recette findRecetteById(int id) {
         EntityManager entityManager = null;
-        EntityTransaction transaction = null;
-        try {
-            entityManager = daoFactory.getEntityManager();
-            
-// ------------------------------------------Methode--------------------------------------------------
-
-            Recette recette = entityManager.find(Recette.class, id);
-            if (recette != null) {
-                transaction = entityManager.getTransaction();
-
-                transaction.begin();
-                entityManager.remove(recette);
-                transaction.commit();
-                System.out.println("<-----------Supression avec success ------->");
-                
-// ---------------------------------------FIN Methode-------------------------------------------------- 
-
-                return true;
-            }
-            System.out.println("<----------- Recette avec id non trouve ------->");
-            return false;
-
-        } catch (Exception ex) {
-            transaction.rollback();
-            System.out.println("Erreur mise a jour Recette \n");
-            ex.printStackTrace();
-
-        } finally {
-            if (entityManager != null) {
-                entityManager.close();
-            }
+        Recette recette = new Recette();
+        entityManager = daoFactory.getEntityManager();
+        Query query = entityManager.createQuery("select util from Recette util where id=:id");
+        query.setParameter("id", id);
+        if (query.getResultList().isEmpty()) {
+            System.out.println("Cet id utilisateur n'existe pas");
+            return null;
         }
-        return false;
+        recette = (Recette) query.getResultList().get(0);
+        recette.toString2();
+        return recette;
     }
-/*
---------------------------------------------------------------------------------------------------------------------------
-                                                Update Recette avec DAO FACTORY 
---------------------------------------------------------------------------------------------------------------------------
-*/
-    @Override
-    public boolean updateRecette(Recette recette, int id) {
-
-        EntityManager entityManager = null;
-        EntityTransaction transaction = null;
-        try {
-            entityManager = daoFactory.getEntityManager();
-            System.out.println("------------------ DEBUT CHANGEMENT ---------");
-// ------------------------------------------Methode--------------------------------------------------
-
-            recette = entityManager.find(Recette.class, id);
-            if (recette != null) {
-                transaction = entityManager.getTransaction();
-                                                
-                recette.setDateModif(dtf.format(now));
-                recette.setLibelle(recette.getLibelle());
-                recette.setDescription(recette.getDescription());
-                
-// Ajouter les ingredients à modifier par ID 
-// ---------------------------------------FIN Methode--------------------------------------------------   
-                System.out.println("--------------------FIN CHANGEMENT-------------");
-                transaction.begin();
-                entityManager.persist(recette);
-                transaction.commit();
-                System.out.println("<----------- Mise a jour Recette avec success ------->");
-                return true;
-
-            }
-            System.out.println("<----------- Recette avec id non trouve ------->");
-            return false;
-
-        } catch (Exception ex) {
-            transaction.rollback();
-            System.out.println("Erreur mise a jour recette \n");
-            ex.printStackTrace();
-
-        } finally {
-            if (entityManager != null) {
-                entityManager.close();
-            }
-        }
-        return false;
-    }
-    
-
 }

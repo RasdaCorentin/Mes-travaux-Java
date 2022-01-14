@@ -193,22 +193,4 @@ public class UtilisateurController {
 
         return response;
     }
-//    //TEST
-//    @POST
-//    @Path("create-user")
-//    @Produces(MediaType.APPLICATION_JSON)
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    public Response updateUtilisateur(String stringJsonObjectData){
-//        //Convertis STring en un objet Json data
-//        JSONObject jSONObjectData = new JSONObject(stringJsonObjectData);
-//        //Recupération du user
-//        String utilisateur = jSONObjectData.getString("utilisateur");
-//        //Recupération de la recette
-//        String jsonRecette = jSONObjectData.getString("recette");
-//        
-//        
-//        Recette recette = jsonb.fromJson(jsonRecette,Recette.class);
-//        
-//        return Response.ok("").build();
-//    }
 }

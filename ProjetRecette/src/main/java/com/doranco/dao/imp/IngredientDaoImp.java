@@ -73,37 +73,38 @@ public class IngredientDaoImp implements IngredientDaoInterface {
     @Override
     public Ingredient createIngredient(Ingredient ingredient) {
         
-        EntityManager entityManager = null;
-        EntityTransaction transaction = null;
+//        EntityManager entityManager = null;
+//        EntityTransaction transaction = null;
         
         try {
-            entityManager = daoFactory.getEntityManager();
-            transaction = entityManager.getTransaction();
+//            entityManager = daoFactory.getEntityManager();
+//            transaction = entityManager.getTransaction();
             
 // ------------------------------------------Methode-------------------------------------------------- 
             
             ingredient.setDateCrea(dtf.format(now));
             ingredient.setDateModif(dtf.format(now));
-//  Il faut ajouter le nom de la ingredient lié à l'ingredient        
             
-            transaction.begin();
-            entityManager.persist(ingredient);
-            transaction.commit();
-            System.out.println("<----------- Creation Ingredient avec success ------->");
+//  Il faut ajouter le nom de la recette lié à l'ingredient                    
+//            transaction.begin();
+//            entityManager.persist(ingredient);
+//            transaction.commit();
+
+            System.out.println("<----------- Creation Ingredient " + ingredient.toString() + " avec success ------->");
             return ingredient;
  
 // ---------------------------------------FIN Methode-------------------------------------------------- 
 
         } catch (Exception ex) {
-            transaction.rollback();
+//            transaction.rollback();
             System.out.println("Erreur creation Ingredient \n");
             ex.printStackTrace();
-
-        } finally {
-            if (entityManager != null) {
-                entityManager.close();
+//
+//        } finally {
+//            if (entityManager != null) {
+//                entityManager.close();
             }
-        }
+//        }
         return null;
     }
 

@@ -5,17 +5,20 @@
 package com.doranco.entities;
 
 
+import jakarta.json.bind.annotation.JsonbTransient;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
+
 
 
 /**
@@ -33,7 +36,7 @@ public class Recette implements Serializable {
     */
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String DateCrea;
     private String DateModif;
@@ -49,7 +52,7 @@ public class Recette implements Serializable {
     
     @ManyToOne
     private Utilisateur utilisateur;
-    
+    @Transient
     @OneToMany(mappedBy = "recette")
     private List<Ingredient> listeIngredients = new ArrayList<>();
     
@@ -102,7 +105,18 @@ public class Recette implements Serializable {
                     + "\n Liste Ingredients: "
                     + this.getListeIngredients();
     }
-    
+    public String toString2() {
+            return "\n Info Utilisateur: "
+                    + this.getUtilisateur()
+                    + "\n Libelle: "
+                    + this.getLibelle()
+                    + "\n Description: "
+                    + this.getDescription()
+                    + "\n Date Creation: "
+                    + this.getDateCrea()
+                    + "\n Date Modification: "
+                    + this.getDateModif();
+        }
     /*
     
     Getters & Setters

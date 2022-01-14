@@ -60,13 +60,35 @@ public class RecetteController {
 
         return response;
     }
+    /*
+--------------------------------------------------------------------------------------------------------------------------
+                                                 Read Recette
+--------------------------------------------------------------------------------------------------------------------------
+     */
+@Path("/read/{id}")
+@GET
+@Produces(MediaType.APPLICATION_JSON)
+public Response readRecette(@PathParam(value = "id") int id){
+    
+    DaoFactory daoFactory = new DaoFactory();
+    RecetteDaoInterface recetteDaoInterface = daoFactory.getRecetteDaoInterface();
+    
+    //Creation d'une réponse
+        Response response = Response
+                .status(Response.Status.CREATED)
+                .entity(recetteDaoInterface.findRecetteById(id))
+                .build();
 
+        daoFactory.closeEntityManagerFactory();
+        
+        return response;
+}
     /*
 --------------------------------------------------------------------------------------------------------------------------
                                                 Création Recette
 --------------------------------------------------------------------------------------------------------------------------
      */
-    @Path("/admin/create")
+    @Path("/create")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -96,52 +118,6 @@ public class RecetteController {
 
         return response;
     }
-
-    /*
---------------------------------------------------------------------------------------------------------------------------
-                                                Update Recette 
---------------------------------------------------------------------------------------------------------------------------
-     */
-    @Path("/admin/update/{id}")
-    @PUT
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateRecette(Recette recette, @PathParam(value = "id") int id) {
-
-        DaoFactory daoFactory = new DaoFactory();
-        RecetteDaoInterface recetteDaoInterface = daoFactory.getRecetteDaoInterface();
-        recetteDaoInterface.updateRecette(recette, id);
-
-        //Creation d'une réponse
-        Response response = Response
-                .status(Response.Status.CREATED)
-                .entity(recette)
-                .build();
-
-        daoFactory.closeEntityManagerFactory();
-        return response;
-    }
-
-    /*
---------------------------------------------------------------------------------------------------------------------------
-                                                 Delete Recette avec DAO FACTORY 
---------------------------------------------------------------------------------------------------------------------------
-     */
-    @Path("/admin/delete/{id}")
-    @DELETE
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteRecette(@PathParam(value = "id") int id) {
-        DaoFactory daoFactory = new DaoFactory();
-
-        RecetteDaoInterface RecetteDaoInterface = daoFactory.getRecetteDaoInterface();
-
-        RecetteDaoInterface.deleteRecette(id);
-        daoFactory.closeEntityManagerFactory();
-
-        Response response = Response
-                .status(Response.Status.CREATED)
-                .entity("Recette id :" + id + " Supprimé")
-                .build();
-        return response;
-    }
 }
+
+

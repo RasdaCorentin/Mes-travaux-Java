@@ -4,12 +4,14 @@
  */
 package com.doranco.entities;
 
+import jakarta.json.bind.annotation.JsonbTransient;
 import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 
 /**
  *
@@ -26,7 +28,7 @@ public class Ingredient implements Serializable{
     */
     
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String libelle;
     private String quantite;
@@ -38,7 +40,7 @@ public class Ingredient implements Serializable{
     Les relations
     
     */
-    
+    @JsonbTransient
     @ManyToOne
     private Recette recette;
     

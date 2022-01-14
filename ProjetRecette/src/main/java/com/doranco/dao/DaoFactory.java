@@ -20,13 +20,6 @@ import javax.persistence.Persistence;
  */
 /*
 Outil merveilleux pour recycler son code.
-USER  1 Créer une recette  
-      2 Lister les recettes 
-      4 Modifier ses recettes 
-      3 Supprimer ses recettes 
-
-ADMIN   Modifier des recettes 
-        Supprimer des recettes 
 
  */
 public class DaoFactory {

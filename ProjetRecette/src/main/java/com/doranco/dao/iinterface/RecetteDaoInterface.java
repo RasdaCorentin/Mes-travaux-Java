@@ -20,11 +20,8 @@ public interface RecetteDaoInterface {
     
     //Creer un Recette
     Recette createRecette(Recette recette, Utilisateur utilisateur);
-    
-    //Supprime un utilisateur (COMMAND ADMIN)
-    boolean deleteRecette(int id);
-    
-    //Modifie un utilisateur
-    boolean updateRecette(Recette recette, int id);
-    
+        
+    //Read recette
+    Recette findRecetteById(int id);
+ 
 }
